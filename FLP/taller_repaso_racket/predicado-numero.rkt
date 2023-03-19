@@ -2,25 +2,46 @@
 
 (define predicado-numero
   (lambda (predicado n lista)
+    (letrec
+        (
+         (filtrar
+          (lambda (p list)
+            (cond
+              [(null? list) '()]
+              [(predicado (car list)) (cons (car list) (filtrar p (cdr list)))]
+              [else (filtrar p (cdr list))]
+              )
+            )
+          )
+         )
+      (cond
+        [(>= (length (filtrar predicado lista)) n) #T]
+        [else #F]
+        )
+      )
+    )
+  )
+
+#|
+(define filtrar
+  (lambda (predicado lista)
     (cond
       [(null? lista) '()]
-      [(predicado (car lista)) (list (car lista) (predicado-numero predicado n (cdr lista)))]
-      [else (predicado-numero predicado n (cdr lista))]
+      [(predicado (car lista)) (cons (car lista) (filtrar predicado (cdr lista)))]
+      [else (filtrar predicado (cdr lista))]
       )
     )
   )
 
-(define contar-lista
-  (lambda (lista)
+(define predicado-numero
+  (lambda (predicado n lista)
     (cond
-      [(null? lista) 0]
-      [else (+ 1 (contar-lista (cdr lista)))]
+      [(= n (length (filtrar predicado lista))) #T]
+      [else #F]
       )
     )
   )
 
-(define lista-ejemplo (list "A"2 3 4 5 6 9 10 11 12 13))
-(display (predicado-numero number? 1 lista-ejemplo))
-(display (contar-lista (predicado-numero number? 1 lista-ejemplo)))
-(display (length (predicado-numero number? 1 lista-ejemplo)))
+|#
+(display (predicado-numero number? 3 '(1 "hola" 2 3 4)))
   
