@@ -4,11 +4,17 @@ JOHAN ALEJANDRO MORENO GIL - 2160052
 JUAN DAVID VALENCIA MONTALVO - 2160103 
 |#
 
+(define arbol_example
+  '(10
+    (7 (4 3 6) (9 8 ()))
+    (15 (12 11 13) (17 16 20))
+    )
+  )
 
 (define insertar
   (lambda (arbol numero)
     (cond
-      [(null? arbol) '()]
+      [(null? arbol) numero]
       [(and (number? arbol)(< numero arbol)) (list arbol numero '())]
       [(and (number? arbol)(>= numero arbol)) (list arbol '() numero)]
       [(and (list? arbol) (< numero (car arbol)))
@@ -20,13 +26,6 @@ JUAN DAVID VALENCIA MONTALVO - 2160103
              (cadr arbol)
              (insertar (caddr arbol) numero))]
       )
-    )
-  )
-
-(define arbol_example
-  '(10
-    (7 (4 3 6) (9 8 ()))
-    (15 (12 11 13) (17 16 20))
     )
   )
 
