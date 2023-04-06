@@ -19,6 +19,9 @@
     (programa (expresion) a-program)
     (expresion (numero) lit-exp)
     (expresion (identificador) var-exp)
+    (expresion ("true") true-exp)
+    (expresion ("false") false-exp)
+    (expresion ("if" expresion "then" expresion "else" expresion) if-exp)
     (expresion (primitiva "(" (separated-list expresion ",") ")") prim-exp)
     (primitiva ("+") sum-prim)
     (primitiva ("-") min-prim)
@@ -26,6 +29,11 @@
     (primitiva ("/") div-prim)
     (primitiva ("add1") add-prim)
     (primitiva ("sub1") sub-prim)
+    (primitiva ("==") ig-prim)
+    (primitiva (">=") mayi-prim)
+    (primitiva ("<=") meni-prim)
+    (primitiva (">") may-prim)
+    (primitiva ("<") men-prim)
     )
   )
 
@@ -37,12 +45,15 @@
       )
     )
   )
+
 ;; Funcion de Trabajo
 (define evaluar-expresion
   (lambda (exp ambiente)
     (cases expresion exp
       (lit-exp (dato) dato)
       (var-exp (id) (apply-env ambiente id))
+      (true-exp () #t)
+      (false-exp () #f)
       (prim-exp (prim list-exp)
                 (let
                     (
@@ -51,6 +62,12 @@
                   (evaluar-primitiva prim lista-val)
                   )
                 )
+      (if-exp (condicion case-t case-f)
+              (if (evaluar-expresion condicion ambiente)
+                  (evaluar-expresion case-t ambiente)
+                  (evaluar-expresion case-f ambiente)
+                  )
+              )
       )
     )
   )
@@ -65,6 +82,11 @@
       (mul-prim ()(operar-primitiva lista-val * 1))
       (add-prim () (+ (car lista-val) 1))
       (sub-prim () (- (car lista-val) 1))
+      (ig-prim () (= (car lista-val) (cadr lista-val)))
+      (mayi-prim () (>= (car lista-val) (cadr lista-val)))
+      (meni-prim () (<= (car lista-val) (cadr lista-val)))
+      (may-prim ()(> (car lista-val) (cadr lista-val)))
+      (men-prim () (< (car lista-val) (cadr lista-val)))
       )
     )
   )
