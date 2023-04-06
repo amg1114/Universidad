@@ -21,7 +21,7 @@
     (expresion (identificador) var-exp)
     (expresion (primitiva "(" (separated-list expresion ",") ")") prim-exp)
     (primitiva ("+") sum-prim)
-    (primitiva ("-") minus-prim)
+    (primitiva ("-") min-prim)
     (primitiva ("*") mul-prim)
     (primitiva ("/") div-prim)
     (primitiva ("add1") add-prim)
@@ -43,11 +43,41 @@
     (cases expresion exp
       (lit-exp (dato) dato)
       (var-exp (id) (apply-env ambiente id))
-      (else "ok")
+      (prim-exp (prim list-exp)
+                (let
+                    (
+                     (lista-val (map (lambda (x) (evaluar-expresion x ambiente)) list-exp))
+                     )
+                  (evaluar-primitiva prim lista-val)
+                  )
+                )
       )
     )
   )
 
+;; Evaluar Primitivas
+(define evaluar-primitiva
+  (lambda (prim lista-val)
+    (cases primitiva prim
+      (sum-prim () (operar-primitiva lista-val + 0))
+      (min-prim ()(operar-primitiva lista-val - 0))
+      (div-prim ()(operar-primitiva lista-val / 1))
+      (mul-prim ()(operar-primitiva lista-val * 1))
+      (add-prim () (+ (car lista-val) 1))
+      (sub-prim () (- (car lista-val) 1))
+      )
+    )
+  )
+
+(define operar-primitiva
+  (lambda (lval opr term)
+    (cond
+      [(null? lval) term]
+      [else (opr (car lval) (operar-primitiva (cdr lval) opr term))]
+      )
+    )
+  )
+                
 
 (sllgen:make-define-datatypes especificacion-lexica especificacion-gramatical)
 
