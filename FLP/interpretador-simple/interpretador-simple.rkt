@@ -22,6 +22,7 @@
     (expresion ("true") true-exp)
     (expresion ("false") false-exp)
     (expresion ("if" expresion "then" expresion "else" expresion) if-exp)
+    (expresion ("let" (arbno identificador "=" expresion) "in" expresion) let-exp)
     (expresion (primitiva "(" (separated-list expresion ",") ")") prim-exp)
     (primitiva ("+") sum-prim)
     (primitiva ("-") min-prim)
@@ -68,6 +69,14 @@
                   (evaluar-expresion case-f ambiente)
                   )
               )
+      (let-exp (ids rands body)
+               (let
+                   (
+                    (lvalues (map (lambda (x) (evaluar-expresion x ambiente)) rands))
+                    )
+                 (evaluar-expresion body (ambiente-extendido ids lvalues ambiente))
+                 )
+               )
       )
     )
   )
@@ -152,7 +161,7 @@
 
 ;; Ambiente Inicial
 (define ambiente-inicial
-  (ambiente-extendido '(x y z) '(1 2 3)
+  (ambiente-extendido '(x y z) '(4 2 5)
                       (ambiente-extendido '(a b c) '(3 2 1)
                                           (ambiente-vacio)
                                           )
