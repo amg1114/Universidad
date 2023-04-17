@@ -162,7 +162,7 @@
     )
   )
 
-(define list-item->simple-item
+(define list-item->elm
   (lambda (el)
     (cases list-item el
       (non-empty-list-item (el lst) el)
@@ -171,7 +171,7 @@
     )
   )
 
-(define list-item->list-item
+(define list-item->lst
   (lambda (el)
     (cases list-item el
       (non-empty-list-item (el lst) lst)
@@ -192,7 +192,11 @@
    (non-empty-record
     'key2
     (simple-element (item-sym 'xyz))
-    (empty-record)
+    (non-empty-record
+     'key3
+     (simple-element (item-num 2))
+     (empty-record)
+     )
     )
    )
   )
@@ -218,7 +222,7 @@
    'ejemplo3
    (list-element
     (non-empty-list-item
-     (item-num '0)
+     (item-num 0)
      (non-empty-list-item
       (item-sym 'x2)
       (empty-list-item)
@@ -235,11 +239,11 @@
    'ejemplo4
    (list-element
     (non-empty-list-item
-     (item-num '0)
+     (item-num 0)
      (non-empty-list-item
-      (item-num '1)
+      (item-num 1)
       (non-empty-list-item
-       (item-num '2)
+       (item-num 2)
        (empty-list-item)
        )
       )
@@ -252,58 +256,143 @@
 (define registro5
   (non-empty-record
    'ejemplo5_key1
-   (simple-element (item-sym 'flp))
+   (simple-element (item-sym 'abc))
    (non-empty-record
     'ejemplo5_key2
     (simple-element (item-sym 'plf))
-    (empty-record)
+    (non-empty-record
+     'ejemplo5_key3
+     (list-element
+      (non-empty-list-item
+       (item-num 0)
+       (non-empty-list-item
+        (item-num 1)
+        (non-empty-list-item
+         (item-num 2)
+         (empty-list-item)
+         )
+        )
+       )
+      )
+     (empty-record)
+    )
     )
    )
   )
 
 
-;; USO DE OBSERVADORES
+(define get-numbers
+  (lambda (obj)
+    (cases record obj
+      (empty-record ()'())
+      (non-empty-record (k el r)
+                        (cases element el
+                          (simple-element (d) (if (item-num? d)
+                                                  (cons (item-num->datum d) (get-numbers r))
+                                                  (get-numbers r)
+                                                  )
+                                          )
+                          (list-element (d) (append
+                                             (extraer-aux d item-num? item-num->datum)
+                                             (get-numbers r)
+                                             )
+                                        )
+                          )
+                        )
+      )
+    )
+  )
 
-(display " ---------- PROBAR PREDICADOS ----------")
+(define get-symbols
+  (lambda (obj)
+    (cases record obj
+      (empty-record ()'())
+      (non-empty-record (k el r)
+                        (cases element el
+                          (simple-element (d) (if (item-sym? d)
+                                                  (cons (item-sym->datum d) (get-symbols r))
+                                                  (get-symbols r)
+                                                  )
+                                          )
+                          (list-element (d) (append
+                                             (extraer-aux d item-sym? item-sym->datum)
+                                             (get-symbols r)
+                                             )
+                                        )
+                          )
+                        )
+      )
+    )
+  )
+
+
+(define extraer-aux
+  (lambda (obj predicado extractor)
+    (cases list-item obj
+      (empty-list-item () '())
+      (non-empty-list-item (elm lst)
+                           (if (predicado elm)
+                               (cons (extractor elm) (extraer-aux lst predicado extractor))
+                               (extraer-aux lst predicado extractor)
+                               )
+                           )
+      )
+    )
+  )
+
+(display "----- Funciones sobre el TAD ------")
+(newline)
+(newline)
+(display "get-numbers sobre registro 1")
+(newline)
+(display (get-numbers registro1))
+(newline)
+
+(display "get-numbers sobre registro 2")
+(newline)
+(display (get-numbers registro2))
+(newline)
+
+(display "get-numbers sobre registro 3")
+(newline)
+(display (get-numbers registro3))
+(newline)
+
+(display "get-numbers sobre registro 4")
+(newline)
+(display (get-numbers registro4))
+(newline)
+
+(display "get-numbers sobre registro 5")
+(newline)
+(display (get-numbers registro5))
+(newline)
+
+(newline)
+(display "------ Probar Get Symbols -----")
 (newline)
 (newline)
 
-(display "Pureba predicado empty-record? con registro0")
+(display "get-symbols sobre registro 1")
 (newline)
-(display (empty-record? registro0))
-(newline)
-
-(display "Pureba predicado non-empty-record? con registro1")
-(newline)
-(display (non-empty-record? registro1))
+(display (get-symbols registro1))
 (newline)
 
-(display "Pureba predicado simple-element? (simple-element (item-num 0))")
+(display "get-symbols sobre registro 2")
 (newline)
-(display (simple-element? (simple-element (item-num 0))))
-(newline)
-
-(display "Pureba predicado list-element? (list-element (empty-list-item))")
-(newline)
-(display (list-element? (list-element (empty-list-item))))
+(display (get-symbols registro2))
 (newline)
 
-(display "Pureba predicado item-num? (item-num 0)")
+(display "get-symbols sobre registro 3")
 (newline)
-(display (item-num? (item-num 0)))
-(newline)
-
-(display "Pureba predicado item-sym? (item-sym 'x)")
-(newline)
-(display (item-sym? (item-sym 'x)))
+(display (get-symbols registro3))
 (newline)
 
-(display "Pureba predicado empty-list-item? (empty-list-item)")
+(display "get-symbols sobre registro 4")
 (newline)
-(display (empty-list-item? (empty-list-item)))
+(display (get-symbols registro4))
 (newline)
 
-(display "Pureba predicado non-empty-list-item? (non-empty-list-item (item-num 0) (empty-list-item))")
+(display "get-symbols sobre registro 5")
 (newline)
-(display (non-empty-list-item? (non-empty-list-item (item-num 0) (empty-list-item))))
-(newline)
+(display (get-symbols registro5)) 
