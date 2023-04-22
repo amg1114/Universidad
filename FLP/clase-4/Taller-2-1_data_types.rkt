@@ -1,5 +1,12 @@
 #lang eopl
 
+#|
+JOHN STIVEN RODAS
+JUAN SEBASTIAN MARIN SERNA
+JOHAN ALEJANDRO MORENO GIL - 2160052
+JUAN DAVID VALENCIA MONTALVO - 2160103
+|#
+
 ;; Datatype Record
 (define-datatype record record?
   (empty-record )
